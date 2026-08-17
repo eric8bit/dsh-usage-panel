@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="zh"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<title>OpenCode 用量</title>
+<script>
+// 首帧主题:iframe 加载时 URL 带 ?theme=light|dark,在 CSS 生效前设置,
+// 避免"先深色后亮色"的闪烁
+(function(){
+  var m = /[?&]theme=(light|dark)/.exec(location.search);
+  if (m && m[1] === 'light') document.documentElement.setAttribute('data-theme', 'light');
+})();
+</script>
+<style>
+:root {
+  --bg:#000000; --card:#1C1C1E; --card2:#2C2C2E;
+  --bord:rgba(255,255,255,0.08); --bord2:rgba(255,255,255,0.05);
+  --t1:#FFFFFF; --t2:rgba(235,235,245,0.60); --t3:rgba(235,235,245,0.32);
+  --acc:#0A84FF; --acc2:#5E5CE6; --grn:#30D158; --amb:#FF9F0A; --red:#FF453A;
+  --track:rgba(255,255,255,0.07); --popup:rgba(28,28,30,0.98);
+  --on-acc:#fff; --glow1:rgba(10,132,255,0.10); --glow2:rgba(94,92,230,0.08);
+  --dot: #1C1C1E;
+  --r:16px;
+}
+/* ===== 亮色主题 ===== */
+:root[data-theme="light"] {
+  --bg:#F5F6F8; --card:#FFFFFF; --card2:#ECEEF1;
+  --bord:rgba(0,0,0,0.10); --bord2:rgba(0,0,0,0.05);
+  --t1:#14161A; --t2:rgba(60,60,67,0.68); --t3:rgba(60,60,67,0.40);
+  --acc:#0A6CFF; --acc2:#5E5CE6; --grn:#1E9E50; --amb:#E8890C; --red:#D93025;
+  --track:rgba(0,0,0,0.06); --popup:rgba(255,255,255,0.98);
+  --on-acc:#fff; --glow1:rgba(10,132,255,0.07); --glow2:rgba(94,92,230,0.05);
+  --dot:#FFFFFF;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+html { -webkit-text-size-adjust:100%; }
+body {
+  background:var(--bg); color:var(--t1);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Helvetica Neue",sans-serif;
+  padding:16px 16px 48px; max-width:780px; margin:0 auto; min-height:100vh;
+  transition:background .12s, color .12s;
+}
+body::before {
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:-1;
+  background:
+    radial-gradient(46% 26% at 78% -6%, var(--glow1), transparent 70%),
+    radial-gradient(36% 22% at 6% -4%, var(--glow2), transparent 70%),
+    var(--bg);
+  transition:background .12s;
+}
+.hero { display:flex; align-items:flex-end; justify-content:space-between; padding:2px 2px 14px; }
+.hero h1 { font-size:22px; font-weight:700; letter-spacing:-0.02em; }
+.hero .sub { color:var(--t3); font-size:11px; margin-top:3px; display:flex; align-items:center; gap:5px; }
+.ricon{display:inline-block; font-size:12px; line-height:1; min-width:12px; text-align:center}
+.ricon.spin{animation:ricspin 1s linear infinite}
+@keyframes ricspin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.hero .pill { font-size:10px; color:var(--t2); background:var(--track); border:1px solid var(--bord); border-radius:999px; padding:4px 11px; }
+.hero .right { position:relative; display:flex; align-items:center; gap:8px; }
+.gear { width:28px; height:28px; border-radius:8px; border:1px solid var(--bord); background:var(--card); color:var(--t2); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:background .15s, color .15s; }
+.gear:hover { background:var(--card2); color:var(--t1); }
+.settings { position:absolute; top:34px; right:0; z-index:20; width:224px; background:var(--card); border:1px solid var(--bord); border-radius:12px; padding:12px 14px; box-shadow:0 10px 32px rgba(0,0,0,.25); display:none; font-size:12px; }
+.settings.show { display:block; }
+.st-row { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:7px 0; color:var(--t2); }
+.st-row b { color:var(--t1); font-weight:500; font-size:12px; }
+.switch { position:relative; flex:none; width:34px; height:20px; border-radius:99px; background:var(--track); border:1px solid var(--bord); cursor:pointer; transition:background .15s; }
+.switch::after { content:""; position:absolute; top:2px; left:2px; width:14px; height:14px; border-radius:50%; background:var(--t1); transition:left .15s; }
+.switch.on { background:var(--acc); border-color:var(--acc); }
+.switch.on::after { left:16px; }
+.st-input { width:64px; background:var(--card2); border:1px solid var(--bord); color:var(--t1); border-radius:6px; padding:3px 7px; font-size:12px; font-family:inherit; text-align:right; font-variant-numeric:tabular-nums; }
+.st-select { width:auto; text-align:left; cursor:pointer; }
+.st-input:focus { outline:none; border-color:var(--acc); }
+.st-tip { color:var(--t3); font-size:10px; padding-top:8px; margin-top:6px; border-top:1px solid var(--bord2); }
+.seg { display:flex; background:var(--track); border:1px solid var(--bord); border-radius:12px; padding:3px; margin-bottom:14px; }
+.seg button { flex:1; border:none; background:transparent; color:var(--t3); font-size:12px; font-weight:500; padding:8px 0; border-radius:9px; font-family:inherit; cursor:pointer; }
+.seg button.on { background:var(--acc); color:var(--on-acc); }
+.bal { background:var(--card); border:1px solid var(--bord); border-radius:var(--r); padding:20px; margin-bottom:14px; transition:background .12s; }
+.bal .k { color:var(--t3); font-size:12px; letter-spacing:0.04em; text-transform:uppercase; }
+.bal .v { font-size:44px; font-weight:700; letter-spacing:-0.03em; margin-top:4px; color:var(--t1); font-variant-numeric:tabular-nums; }
+.bal .v small { font-size:15px; color:var(--t2); font-weight:500; }
+.bal .hint { color:var(--t3); font-size:11px; margin-top:10px; }
+.grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; }
+.tile { background:var(--card); border:1px solid var(--bord); border-radius:var(--r); padding:16px; transition:background .12s; }
+.tile .k { color:var(--t3); font-size:11px; letter-spacing:0.04em; }
+.tile .v { font-size:27px; font-weight:650; letter-spacing:-0.02em; margin-top:5px; font-variant-numeric:tabular-nums; }
+.tile .v small { font-size:11px; color:var(--t2); font-weight:400; }
+.panel { background:var(--card); border:1px solid var(--bord); border-radius:var(--r); padding:18px; margin-bottom:14px; transition:background .12s; }
+.panel h2 { font-size:11.5px; color:var(--t3); font-weight:600; letter-spacing:0.08em; margin-bottom:14px; text-transform:uppercase; }
+.hint2 { float:right; color:var(--t3); font-size:10px; font-weight:400; letter-spacing:0.02em; text-transform:none; margin-top:1px; }
+.qrow { margin:15px 0; }
+.qtop { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:7px; }
+.qtop span:first-child { font-size:13px; font-weight:500; }
+.qpct { font-size:18px; font-weight:700; font-variant-numeric:tabular-nums; }
+.qtrk { background:var(--track); border-radius:999px; height:9px; overflow:hidden; }
+.qfill { height:100%; border-radius:999px; }
+.qrst { font-size:10px; color:var(--t3); margin-top:5px; }
+.bars { display:flex; align-items:flex-end; gap:10px; height:230px; padding:34px 6px 6px; }
+.bcol { flex:1 1 0%; min-width:0; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; position:relative; cursor:pointer; }
+/* key 多时紧凑模式:所有柱子等分收窄,全部放进卡片(不滚动) */
+.bars.compact { gap:2px; }
+.bars.compact .bfill { border-radius:6px 6px 2px 2px; }
+.bars.compact .bval { font-size:7.5px; top:-15px; }
+.bars.compact .bname { font-size:8px; margin-top:5px; }
+.bars.compact .bhit { display:none; }
+.bars.crowded .bval { display:none; }
+.bars.crowded .bname { font-size:7.5px; margin-top:4px; }
+.bfill { width:100%; max-width:46px; border-radius:10px 10px 4px 4px; position:relative; min-height:3px; box-shadow:0 8px 20px rgba(0,0,0,0.35); }
+.bval { position:absolute; top:-24px; left:50%; transform:translateX(-50%); font-size:11.5px; font-weight:700; color:var(--t1); white-space:nowrap; font-variant-numeric:tabular-nums; }
+.bname { font-size:11.5px; font-weight:600; margin-top:9px; color:var(--t2); max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.bhit { font-size:10px; font-weight:600; margin-top:2px; font-variant-numeric:tabular-nums; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.kinfo { display:none; background:var(--popup); border:1px solid var(--bord); border-radius:14px; padding:16px 18px; margin-top:16px; font-size:12.5px; box-shadow:0 8px 28px rgba(0,0,0,.18); }
+.kinfo.show { display:block; }
+.kinfo .kt { font-size:16px; font-weight:700; margin-bottom:10px; }
+.kinfo .kr { display:flex; justify-content:space-between; padding:5px 0; color:var(--t2); border-bottom:1px solid var(--bord2); }
+.kinfo .kr:last-child { border-bottom:none; }
+.kinfo .kr b { color:var(--t1); font-variant-numeric:tabular-nums; }
+.piewrap { display:flex; align-items:center; gap:16px; }
+.legend { flex:1; min-width:0; }
+.leg { display:flex; align-items:center; gap:7px; padding:4px 0; font-size:11px; }
+.dot { width:10px; height:10px; border-radius:3px; flex:none; }
+.ln { flex:1; color:var(--t2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.lv { font-weight:600; font-variant-numeric:tabular-nums; }
+.lp { color:var(--t3); width:38px; text-align:right; font-variant-numeric:tabular-nums; }
+.trendbox { width:100%; height:160px; }
+table { width:100%; border-collapse:collapse; font-size:11px; }
+th { text-align:left; color:var(--t3); font-weight:500; padding:5px 6px; border-bottom:1px solid var(--bord); }
+td { text-align:left; padding:7px 6px; border-bottom:1px solid var(--bord2); font-variant-numeric:tabular-nums; color:var(--t2); }
+tr:last-child td { border-bottom:none; }
+td.mono { font-family:ui-monospace,Menlo,monospace; font-size:10px; }
+.foot { text-align:center; color:var(--t3); font-size:10px; margin:18px 0 4px; }
+</style></head>
+<body>
+<div id="err" style="display:none;background:rgba(255,69,58,0.15);border:1px solid rgba(255,69,58,0.4);color:var(--t1);border-radius:12px;padding:12px;font-size:12px;margin-bottom:12px"></div>
+
+<div class="hero">
+  <div><h1>OpenCode · Go</h1><div class="sub"><span id="sub">加载中…</span><span class="ricon" id="ricon"></span></div></div>
+  <div class="right">
+    <span class="pill" id="pill"></span>
+    <button class="gear" id="gear" title="设置" aria-label="设置">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.61 3.61 0 0 1 8.4 12c0-1.98 1.62-3.6 3.6-3.6s3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+    </button>
+    <div class="settings" id="settings">
+      <div class="st-row"><b>自动刷新</b>
+        <select class="st-input st-select" id="sel-interval">
+          <option value="10">10 秒</option>
+          <option value="30">30 秒</option>
+          <option value="60">60 秒</option>
+          <option value="0">关闭</option>
+        </select>
+      </div>
+      <div class="st-row"><b>每天自动刷新汇率</b><span class="switch" id="sw-fx"></span></div>
+      <div class="st-row"><b>汇率(¥/$)</b><input class="st-input" id="rate" type="number" step="0.1" min="1" max="30"></div>
+      <div class="st-row"><b>显示 ¥ 换算</b><span class="switch" id="sw-cny"></span></div>
+      <div class="st-row"><b>只显示人民币</b><span class="switch" id="sw-cnyonly"></span></div>
+      <div class="st-tip" id="fx-tip">设置保存在本机,重开仪表盘后仍生效</div>
+    </div>
+  </div>
+</div>
+
+<div class="seg" id="seg">
+  <button data-r="2h" class="on">近2小时</button>
+  <button data-r="today">今天</button>
+  <button data-r="7d">近7天</button>
+  <button data-r="month">本月</button>
+  <button data-r="all">全部</button>
+</div>
+
+<div class="panel"><h2 id="quota-title">订阅额度</h2><div id="quota"></div></div>
+
+<div class="bal"><div class="k">当前余额</div><div class="v" id="balance">…</div><div class="hint" id="balhint"></div></div>
+
+<div class="grid">
+  <div class="tile"><div class="k">已花费</div><div class="v"><span id="st-cost">…</span> <small id="st-cny"></small></div></div>
+  <div class="tile"><div class="k">请求次数</div><div class="v" id="st-n">…</div></div>
+  <div class="tile"><div class="k">Tokens 总量</div><div class="v"><span id="st-tok">…</span> <small id="st-tok-sub"></small></div></div>
+  <div class="tile"><div class="k">缓存命中率</div><div class="v"><span id="st-hit">…</span> <small id="st-hit-sub"></small></div></div>
+</div>
+
+<div class="panel"><h2>API Key · 用量对比 <span class="hint2">点柱查看详情</span></h2><div class="bars" id="kbars"></div><div class="kinfo" id="kinfo"></div></div>
+<div class="panel"><h2>模型成本占比</h2><div class="piewrap"><svg id="piechart" viewBox="0 0 200 200" style="width:168px;height:168px;flex:none"></svg><div id="pielegend" class="legend"></div></div></div>
+<div class="panel"><h2>成本趋势</h2>
+<svg class="trendbox" id="trend" viewBox="0 0 340 160" preserveAspectRatio="none">
+  <defs><linearGradient id="tg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(10,132,255,0.26)"/><stop offset="100%" stop-color="rgba(10,132,255,0)"/></linearGradient></defs>
+  <g id="tgrid" stroke="rgba(255,255,255,0.06)" stroke-dasharray="3 5" stroke-width="1"></g>
+  <path id="trendline" fill="none" stroke="#0A84FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+  <path id="trendfill" fill="url(#tg)" stroke="none"/>
+  <g id="tdots"></g>
+</svg>
+<div id="trend-labels" style="display:flex;justify-content:space-between;font-size:9px;color:var(--t3);margin-top:4px"></div></div>
+
+<div class="panel"><h2>最近请求</h2>
+<table><thead><tr><th>时间</th><th>模型</th><th>输入</th><th>输出</th><th>成本</th></tr></thead><tbody id="tbl"><tr><td colspan="5" style="color:var(--t3)">加载中…</td></tr></tbody></table></div>
+
+<div class="foot"><span id="range-label">近 2 小时</span> · 每 30s 自动刷新</div>
+
+<script>
+try {
+var RECS = [], MODELS = [], KNAMES = [], KEYN = {};
+var NOW = Date.now(), TZ = 8*3600*1000, cur = '2h';
+var RLABEL = {'2h':'近 2 小时', today:'今天', '7d':'近 7 天', month:'本月', all:'全部'};
+
+function p2(n){ return (n<10?'0':'')+n; }
+function shortT(ts){ var d=new Date(ts+TZ); return p2(d.getUTCMonth()+1)+'-'+p2(d.getUTCDate())+' '+p2(d.getUTCHours())+':'+p2(d.getUTCMinutes()); }
+function hc(h){ return h>=80?'#30D158':(h>=50?'#FF9F0A':'#FF453A'); }
+function m6(v){ return (v/1e6).toFixed(1)+'M'; }
+function fmtReset(sec){ if(!sec||sec<=0) return '已重置'; var d=Math.floor(sec/86400),h=Math.floor((sec%86400)/3600),mm=Math.floor((sec%3600)/60); return d>0?d+'天'+h+'时':(h>0?h+'时'+mm+'分':mm+'分'); }
+
+function rangeStart(r){
+  var d = new Date(NOW + TZ);
+  var y = d.getUTCFullYear(), mo = d.getUTCMonth(), da = d.getUTCDate();
+  if(r==='2h') return NOW - 2*3600*1000;
+  if(r==='today') return Date.UTC(y,mo,da) - TZ;
+  if(r==='7d') return NOW - 7*864e5;
+  if(r==='month') return Date.UTC(y,mo,1) - TZ;
+  return 0;
+}
+
+function compute(recs){
+  var st = {n:0,cost:0,inp:0,out:0,cache:0,byModel:{},byKey:{}};
+  for(var x=0;x<recs.length;x++){
+    var r=recs[x], c=r[2], i=r[3], o=r[4], ck=r[6];
+    st.n++; st.cost+=c; st.inp+=i; st.out+=o; st.cache+=ck;
+    var mi=r[1]; if(!st.byModel[mi]) st.byModel[mi]={n:0,cost:0}; st.byModel[mi].n++; st.byModel[mi].cost+=c;
+    var ki=r[5]; if(!st.byKey[ki]) st.byKey[ki]={n:0,cost:0,inp:0,out:0,cache:0};
+    var bk=st.byKey[ki]; bk.n++; bk.cost+=c; bk.inp+=i; bk.out+=o; bk.cache+=ck;
+  }
+  return st;
+}
+
+function render(){
+  var recs = [], start = rangeStart(cur);
+  for(var x=0;x<RECS.length;x++) if(RECS[x][0]>=start) recs.push(RECS[x]);
+  var st = compute(recs);
+  var hit = st.cache+st.inp>0 ? st.cache/(st.cache+st.inp)*100 : 0;
+
+  document.getElementById('st-cost').textContent = money(st.cost);
+  document.getElementById('st-cny').textContent = (!SET.cnyonly && SET.cny) ? moneySub(st.cost) : '';
+  document.getElementById('st-n').textContent = st.n.toLocaleString();
+  document.getElementById('st-tok').textContent = ((st.inp+st.out)/1e6).toFixed(2)+'M';
+  document.getElementById('st-tok-sub').textContent = 'in '+m6(st.inp);
+  document.getElementById('st-hit').textContent = hit.toFixed(1)+'%';
+  document.getElementById('st-hit-sub').textContent = m6(st.cache)+' tok';
+  document.getElementById('range-label').textContent = RLABEL[cur];
+
+  // API Key 柱状图(从小到大)
+  var keys = [];
+  for(var k in st.byKey){ var d=st.byKey[k]; keys.push({id:k,name:KEYN[k]||k,n:d.n,cost:d.cost,inp:d.inp,out:d.out,cache:d.cache,hit:d.inp+d.cache>0?d.cache/(d.inp+d.cache)*100:0}); }
+  keys.sort(function(a,b){ return a.cost-b.cost; });
+  var mk = 0.0001; for(var i=0;i<keys.length;i++) if(keys[i].cost>mk) mk=keys[i].cost;
+  var tcost = Math.max(st.cost,0.0001);
+  var kb = document.getElementById('kbars'), html = '';
+  // key 多时启用紧凑模式:全部柱子等分收窄、一次放进卡片
+  kb.className = 'bars' + (keys.length > 10 ? ' compact' : '') + (keys.length > 20 ? ' crowded' : '');
+  for(var i=0;i<keys.length;i++){
+    var kk=keys[i], h=Math.max(kk.cost/mk*100,2), col=hc(kk.hit);
+    html += '<div class="bcol" data-i="'+i+'">' +
+      '<div class="bfill" style="height:'+h+'%;background:linear-gradient(180deg,'+col+',rgba(28,28,30,0.4))"><span class="bval">'+money(kk.cost)+'</span></div>' +
+      '<div class="bname">'+kk.name+'</div><div class="bhit" style="color:'+col+'">'+kk.hit.toFixed(0)+'% 命中</div></div>';
+  }
+  kb.innerHTML = html || '<div style="color:var(--t3);font-size:12px">无记录</div>';
+  var info = document.getElementById('kinfo');
+  // 每次重绘(数据刷新/切换范围)后重置详情面板,避免显示过期数据
+  var kinfoKey = null;
+  var cols = kb.getElementsByClassName('bcol');
+  for(var j=0;j<cols.length;j++){ (function(idx){ cols[j].onclick = function(){
+    if (kinfoKey === idx) {
+      // 再次点击同一柱子:收起
+      kinfoKey = null;
+      info.className = 'kinfo';
+      return;
+    }
+    kinfoKey = idx;
+    var kk=keys[idx], rows=[['成本',money(kk.cost)+' · 占 '+(kk.cost/tcost*100).toFixed(0)+'%'],['请求',kk.n.toLocaleString()+' 次'],['输入',kk.inp.toLocaleString()],['输出',kk.out.toLocaleString()],['缓存',kk.cache.toLocaleString()+' tok'],['命中率',kk.hit.toFixed(1)+'%']];
+    var h2='<div class="kt">'+kk.name+'</div>'; for(var q=0;q<rows.length;q++) h2+='<div class="kr"><span>'+rows[q][0]+'</span><b>'+rows[q][1]+'</b></div>';
+    info.innerHTML=h2; info.className='kinfo show';
+  }; })(j); }
+
+  // 模型成本占比(圆环图)
+  var ms = []; for(var m in st.byModel) ms.push([m, st.byModel[m]]);
+  ms.sort(function(a,b){ return b[1].cost-a[1].cost; });
+  if(!window.MC) window.MC = {};
+  var PC = ['#0A84FF','#5E5CE6','#64D2FF','#BF5AF2','#30D158','#FF9F0A','#FF375F','#FFD60A'];
+  // 颜色分配:已缓存的模型保持原色,新模型取第一个未被占用的颜色
+  // (不能从 0 重新数,否则与已缓存模型同色)
+  var taken = {};
+  for(var tk in window.MC) taken[window.MC[tk]] = true;
+  var used = 0;
+  for(var i=0;i<ms.length;i++){
+    var mk = ms[i][0];
+    if(window.MC[mk]) continue;
+    while(taken[PC[used % PC.length]]) used++;
+    window.MC[mk] = PC[used % PC.length];
+    taken[window.MC[mk]] = true;
+    used++;
+  }
+  var cx=100,cy=100,r=84,ri=56,paths='',start=-Math.PI/2,tot=Math.max(st.cost,1e-9);
+  // 圆环扇区路径:外弧 M→A(顺),内弧 A(逆)返回,闭合 Z
+  function ringPath(x1o,y1o,x2o,y2o,x1i,y1i,x2i,y2i,large){
+    return 'M'+x1o.toFixed(1)+' '+y1o.toFixed(1)+
+      ' A'+r+' '+r+' 0 '+large+' 1 '+x2o.toFixed(1)+' '+y2o.toFixed(1)+
+      ' L'+x2i.toFixed(1)+' '+y2i.toFixed(1)+
+      ' A'+ri+' '+ri+' 0 '+large+' 0 '+x1i.toFixed(1)+' '+y1i.toFixed(1)+' Z';
+  }
+  if(ms.length===1){
+    // 单模型 100%:外圈整圆 + 内圈挖空 = 完整圆环
+    paths='<circle cx="100" cy="100" r="'+r+'" fill="'+window.MC[ms[0][0]]+'"/><circle cx="100" cy="100" r="'+ri+'" style="fill:var(--card)"/>';
+  } else {
+    // 找最后一个可见扇区(占比>0.0002),其终点强制闭合到 360°,消除浮点累积的细缝
+    var lastIdx=-1;
+    for(var i=ms.length-1;i>=0;i--){ if(ms[i][1].cost/tot>0.0002){ lastIdx=i; break; } }
+    for(var i=0;i<ms.length;i++){
+      var frac=ms[i][1].cost/tot;
+      var end = (i===lastIdx) ? -Math.PI/2+2*Math.PI : start+frac*2*Math.PI;
+      if(frac>0.0002){
+        var x1o=cx+r*Math.cos(start),y1o=cy+r*Math.sin(start),x2o=cx+r*Math.cos(end),y2o=cy+r*Math.sin(end);
+        var x1i=cx+ri*Math.cos(start),y1i=cy+ri*Math.sin(start),x2i=cx+ri*Math.cos(end),y2i=cy+ri*Math.sin(end);
+        var large=(end-start)>Math.PI?1:0;
+        paths+='<path d="'+ringPath(x1o,y1o,x2o,y2o,x1i,y1i,x2i,y2i,large)+'" fill="'+window.MC[ms[i][0]]+'"/>';
+      }
+      start=end;
+    }
+  }
+  // 中心显示当前范围总成本
+  var pieHtml = paths
+    ? paths + '<text x="100" y="99" text-anchor="middle" style="fill:var(--t1);font-size:18px;font-weight:700">'+money(st.cost)+'</text>'
+            + '<text x="100" y="114" text-anchor="middle" style="fill:var(--t3);font-size:9px">总成本</text>'
+    : '<circle cx="100" cy="100" r="'+r+'" style="fill:var(--track)"/><circle cx="100" cy="100" r="'+ri+'" style="fill:var(--card)"/>';
+  document.getElementById('piechart').innerHTML = pieHtml;
+  var legend=''; for(var i=0;i<ms.length;i++) legend+='<div class="leg"><span class="dot" style="background:'+window.MC[ms[i][0]]+'"></span><span class="ln">'+MODELS[ms[i][0]]+'</span><span class="lv">'+money(ms[i][1].cost)+'</span><span class="lp">'+(ms[i][1].cost/tot*100).toFixed(0)+'%</span></div>';
+  document.getElementById('pielegend').innerHTML = legend || '<div style="color:var(--t3);font-size:12px">无记录</div>';
+
+  // 趋势(粒度自适应:聚合点过少时自动降级到更细粒度,避免画不出线)
+  var gran = cur==='2h'?'min15':(cur==='today'?'hour':'day');
+  var agg={};
+  function granKey(d2, g){
+    if(g==='hour') return p2(d2.getUTCMonth()+1)+'-'+p2(d2.getUTCDate())+' '+p2(d2.getUTCHours())+':00';
+    if(g==='min15') return p2(d2.getUTCMonth()+1)+'-'+p2(d2.getUTCDate())+' '+p2(d2.getUTCHours())+':'+p2(Math.floor(d2.getUTCMinutes()/15)*15);
+    return p2(d2.getUTCMonth()+1)+'-'+p2(d2.getUTCDate());
+  }
+  function buildAgg(g){
+    var a={};
+    for(var x=0;x<recs.length;x++){ var d2=new Date(recs[x][0]+TZ), key=granKey(d2,g);
+      a[key]=(a[key]||0)+recs[x][2]; }
+    return a;
+  }
+  agg=buildAgg(gran);
+  var s2=[]; for(var k2 in agg) s2.push([k2,agg[k2]]); s2.sort(function(a,b){return a[0]<b[0]?-1:1;});
+  // 降级:day 只有 1 个点 → hour;hour 只有 1 个点 → min15
+  while(s2.length<2 && gran!=='min15'){
+    gran = gran==='day' ? 'hour' : 'min15';
+    agg=buildAgg(gran);
+    s2=[]; for(var k2 in agg) s2.push([k2,agg[k2]]); s2.sort(function(a,b){return a[0]<b[0]?-1:1;});
+  }
+  var W=340,H=160,PAD=10,tmax=0.0001; for(var i=0;i<s2.length;i++) if(s2[i][1]>tmax) tmax=s2[i][1];
+  var grid=''; for(var g=1;g<=3;g++){ var gy=(H-2*PAD)*g/4+PAD; grid+='<line x1="0" y1="'+gy+'" x2="'+W+'" y2="'+gy+'"/>'; }
+  document.getElementById('tgrid').innerHTML=grid;
+  var pts=[]; for(var i=0;i<s2.length;i++){ var px=s2.length>1?PAD+(W-2*PAD)*i/(s2.length-1):W/2; var py=H-PAD-(H-2*PAD)*s2[i][1]/tmax; pts.push({x:px,y:py}); }
+  if(pts.length>=1){
+    var d='M'+pts[0].x.toFixed(1)+','+pts[0].y.toFixed(1);
+    for(var i=0;i<pts.length-1;i++){ var pt0=pts[i-1]||pts[i],pt1=pts[i],pt2=pts[i+1],pt3=pts[i+2]||pt2;
+      var c1x=pt1.x+(pt2.x-pt0.x)/6,c1y=pt1.y+(pt2.y-pt0.y)/6,c2x=pt2.x-(pt3.x-pt1.x)/6,c2y=pt2.y-(pt3.y-pt1.y)/6;
+      d+=' C'+c1x.toFixed(1)+','+c1y.toFixed(1)+' '+c2x.toFixed(1)+','+c2y.toFixed(1)+' '+pt2.x.toFixed(1)+','+pt2.y.toFixed(1); }
+    document.getElementById('trendline').setAttribute('d',d);
+    document.getElementById('trendfill').setAttribute('d', d+' L'+pts[pts.length-1].x.toFixed(1)+','+H+' L'+pts[0].x.toFixed(1)+','+H+' Z');
+    var dots=''; for(var i=0;i<pts.length;i++) dots+='<circle cx="'+pts[i].x.toFixed(1)+'" cy="'+pts[i].y.toFixed(1)+'" r="3" style="fill:var(--dot)" stroke="#0A84FF" stroke-width="1.5"/>';
+    document.getElementById('tdots').innerHTML=dots;
+    var tl='',step=Math.max(1,Math.floor(s2.length/5)); for(var i=0;i<s2.length;i+=step) tl+='<span>'+s2[i][0]+'</span>';
+    document.getElementById('trend-labels').innerHTML=tl;
+  }
+
+  // 明细
+  var tr=recs.slice().sort(function(a,b){return b[0]-a[0];}), thtml='';
+  for(var i=0;i<Math.min(tr.length,14);i++) thtml+='<tr><td>'+shortT(tr[i][0])+'</td><td class="mono">'+MODELS[tr[i][1]]+'</td><td>'+tr[i][3].toLocaleString()+'</td><td>'+tr[i][4].toLocaleString()+'</td><td>'+money(tr[i][2])+'</td></tr>';
+  document.getElementById('tbl').innerHTML = thtml || '<tr><td colspan="5" style="color:var(--t3)">无记录</td></tr>';
+}
+
+function applyData(p){
+  RECS = p.records || [];
+  MODELS = p.models || [];
+  KNAMES = p.knames || [];
+  KEYN = {}; for(var i=0;i<KNAMES.length;i++) KEYN[i]=KNAMES[i];
+  // 服务端当日汇率(每天自动刷新)
+  if (p.fx && p.fx.rate) FX = p.fx;
+  document.getElementById('balance').innerHTML = money(p.balance) + (SET.cnyonly || !SET.cny ? '' : ' <small>'+moneySub(p.balance)+'</small>');
+  document.getElementById('balhint').textContent = '订阅 Go · ' + (SET.interval > 0 ? '每 ' + SET.interval + 's 自动刷新' : '自动刷新已关闭');
+  document.getElementById('pill').textContent = p.payment || 'alipay';
+  document.getElementById('sub').textContent = (p.email || 'opencode') + ' · 更新于 ' + new Date(p.updated).toLocaleString();
+  var ftip = document.getElementById('fx-tip');
+  if (ftip) {
+    if (FX) ftip.textContent = '今日汇率 ' + FX.rate + ' (自动) · 设置保存在本机';
+    else ftip.textContent = '汇率获取失败,使用本地设置 · 设置保存在本机';
+  }
+  syncSettingsUI(); // 刷新汇率后同步输入框禁用状态
+  // 订阅额度
+  var l=p.lite||{}, q='';
+  function qrow(label,u,grad,bar){ var pct=Math.max(0,Math.min(parseInt(u.pct)||0,100)); var b=pct<70?'#30D158':(pct<90?'#FF9F0A':'#FF453A');
+    return '<div class="qrow"><div class="qtop"><span>'+label+'</span><span class="qpct" style="color:'+b+'">'+pct+'%</span></div><div class="qtrk"><div class="qfill" style="width:'+pct+'%;background:linear-gradient(90deg,'+grad+')"></div></div><div class="qrst">'+fmtReset(u.reset)+'后重置</div></div>'; }
+  q = qrow('滚动用量',l.rolling,'#0A84FF,#5E5CE6')+qrow('每周用量',l.weekly,'#30D158,#64D2FF')+qrow('每月用量',l.monthly,'#FF9F0A,#FFD60A');
+  document.getElementById('quota').innerHTML = q;
+  document.getElementById('quota-title').textContent = '订阅额度 · Go' + (l.useBalance?'':' · 余额兜底关');
+  render();
+}
+
+document.getElementById('seg').addEventListener('click', function(e){
+  var b=e.target; while(b&&b.tagName!=='BUTTON') b=b.parentNode; if(!b) return;
+  NOW = Date.now(); // 切换范围时以当前时间为基准
+  cur=b.getAttribute('data-r'); var btns=document.querySelectorAll('#seg button');
+  for(var i=0;i<btns.length;i++) btns[i].className=(btns[i]===b?'on':'');
+  render();
+});
+
+// 刷新状态纯图标:加载中转圈 / 成功 ✓ / 失败 ✕
+function setTip(state){
+  var ic=document.getElementById('ricon');
+  if(!ic) return;
+  ic.className='ricon';
+  ic.style.color='';
+  if(state==='loading'){ ic.textContent='⟳'; ic.className='ricon spin'; ic.style.color='#FF9F0A'; }
+  else if(state==='ok'){ ic.textContent='✓'; ic.style.color='#30D158'; }
+  else if(state==='err'){ ic.textContent='✕'; ic.style.color='#FF453A'; }
+  else { ic.textContent=''; }
+}
+
+// ===== 设置(齿轮):刷新间隔 / 汇率自动更新 / ¥ 显示,localStorage 记忆 =====
+var SET = (function(){ try { return JSON.parse(localStorage.getItem('dshup-set') || 'null') || {}; } catch(e){ return {}; } })();
+if (![10,30,60,0].includes(Number(SET.interval))) SET.interval = 30; // 自动刷新间隔(秒),0=关闭
+if (typeof SET.fx !== 'boolean') SET.fx = true;   // 每天自动刷新汇率(用服务端当日汇率)
+if (typeof SET.cny !== 'boolean') SET.cny = true;  // 显示 ¥ 换算(美元主价 + ¥ 副价)
+if (typeof SET.cnyonly !== 'boolean') SET.cnyonly = false; // 只显示人民币
+if (!SET.rate || isNaN(SET.rate) || SET.rate <= 0) SET.rate = 7.2;
+function saveSet(){ try { localStorage.setItem('dshup-set', JSON.stringify(SET)); } catch(e){ /* 忽略 */ } }
+
+var FX = null; // 服务端当日汇率 {rate, date}
+// 生效汇率:开启"每天自动刷新"且服务端有值 → 用服务端汇率,否则用本地设置
+function curRate(){ return (SET.fx && FX && FX.rate) ? FX.rate : SET.rate; }
+// 金额格式化:cnyonly → 只显示 ¥;否则 $ 主价(可带 ¥ 副价由调用方决定)
+function money(v){ return SET.cnyonly ? '¥'+(v*curRate()).toFixed(2) : '$'+v.toFixed(2); }
+function moneySub(v){ return SET.cnyonly ? '' : '≈ ¥'+(v*curRate()).toFixed(2); }
+
+var autoTimer = null;
+function applyAuto(){
+  if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
+  if (SET.interval > 0) autoTimer = setInterval(load, SET.interval * 1000);
+}
+function syncSettingsUI(){
+  document.getElementById('sel-interval').value = String(SET.interval);
+  document.getElementById('sw-fx').className = 'switch' + (SET.fx ? ' on' : '');
+  document.getElementById('sw-cny').className = 'switch' + (SET.cny ? ' on' : '');
+  document.getElementById('sw-cnyonly').className = 'switch' + (SET.cnyonly ? ' on' : '');
+  document.getElementById('rate').value = SET.rate;
+  document.getElementById('rate').disabled = SET.fx && !!FX; // 自动汇率时手动输入禁用
+}
+document.getElementById('gear').addEventListener('click', function(e){
+  e.stopPropagation();
+  document.getElementById('settings').classList.toggle('show');
+});
+document.addEventListener('click', function(e){
+  var s = document.getElementById('settings');
+  if (s.classList.contains('show') && !s.contains(e.target)) s.classList.remove('show');
+});
+document.getElementById('sel-interval').addEventListener('change', function(){
+  SET.interval = Number(this.value); saveSet(); applyAuto();
+});
+document.getElementById('sw-fx').addEventListener('click', function(){
+  SET.fx = !SET.fx; saveSet(); syncSettingsUI(); render();
+});
+document.getElementById('sw-cny').addEventListener('click', function(){
+  SET.cny = !SET.cny; saveSet(); syncSettingsUI(); render();
+});
+document.getElementById('sw-cnyonly').addEventListener('click', function(){
+  SET.cnyonly = !SET.cnyonly; saveSet(); syncSettingsUI(); render();
+});
+document.getElementById('rate').addEventListener('change', function(){
+  var v = parseFloat(this.value);
+  if (!isNaN(v) && v > 0 && v < 100) { SET.rate = v; saveSet(); render(); }
+  else this.value = SET.rate;
+});
+
+function load(){
+  setTip('loading');
+  fetch('/dsh-usage-panel/data').then(function(r){return r.json();}).then(function(d){
+    // 数据未就绪(未配置凭据/获取失败等)时,展示明确提示而不是继续渲染导致崩溃
+    if (!d || d.error || typeof d.balance !== 'number') {
+      var ed=document.getElementById('err'); ed.style.display='block';
+      ed.textContent = (d && d.message) ? d.message : '数据服务未连接(暂无有效数据)';
+      setTip('err');
+      return;
+    }
+    applyData(d);
+    setTip('ok');
+  }).catch(function(e){
+    var ed=document.getElementById('err'); ed.style.display='block'; ed.textContent='数据服务未连接: '+e.message;
+    setTip('err');
+  });
+}
+syncSettingsUI();
+applyAuto();
+load(); // 首次加载数据(自动刷新由 applyAuto 按设置启动)
+// ===== 主题:完全自动跟随 DSH web 亮暗(收到宿主主题即切换) =====
+var hostTheme = null;
+var urlTheme = (function(){ var m=/[?&]theme=(light|dark)/.exec(location.search); return m ? m[1] : null; })();
+function setRootTheme(){
+  var root = document.documentElement;
+  if (hostTheme) root.setAttribute('data-theme', hostTheme.theme === 'light' ? 'light' : '');
+  else if (urlTheme === 'light') root.setAttribute('data-theme', 'light'); // 宿主消息到达前保持首帧主题
+  else root.removeAttribute('data-theme');
+}
+// 宿主插件在后台刷新完数据后通知本页立即重新拉取
+// 以及父窗口(DSH web)返回的主题(亮暗模式),收到即自动切换
+window.addEventListener('message', function(e){
+  var d = e.data;
+  if (d === 'dshup-refresh') { load(); return; }
+  if (d === 'dshup-reset') {
+    // 每次打开面板:刷新基准时间并重置回默认视图(近2小时)
+    NOW = Date.now();
+    cur = '2h';
+    var btns = document.querySelectorAll('#seg button');
+    for (var i = 0; i < btns.length; i++) btns[i].className = (btns[i].getAttribute('data-r') === '2h' ? 'on' : '');
+    render();
+    return;
+  }
+  if (d && d.dshupTheme) {
+    hostTheme = d.dshupTheme;
+    setRootTheme();
+  }
+});
+setRootTheme();
+// 主动向父窗口请求主题(首次加载与每次重载都会触发)
+window.parent.postMessage('dshup-theme-request', '*');
+} catch(e) {
+  var ed = document.getElementById('err');
+  if(ed){ ed.style.display='block'; ed.textContent = '渲染出错: ' + (e && e.message || e); }
+}
+</script>
+</body></html>

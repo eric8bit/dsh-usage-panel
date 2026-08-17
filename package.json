@@ -1,0 +1,40 @@
+{
+  "name": "dsh-usage-panel",
+  "version": "0.1.1",
+  "description": "OpenCode 用量同源仪表盘:DSH web 右下角悬浮卡片,点击展开余额/指标/订阅额度/Key 柱状图/模型饼图/成本趋势/明细表,主题自动跟随 DSH web,数据由宿主进程直接抓取,无需独立服务",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "dashboard.html",
+    "install.bat",
+    "set-credentials.bat",
+    "uninstall.bat",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "deepseek",
+    "deepseek-harness",
+    "dsh",
+    "opencode",
+    "usage",
+    "dashboard",
+    "token-usage"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web"
+    }
+  },
+  "license": "MIT"
+}

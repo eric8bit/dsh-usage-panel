@@ -1,0 +1,4 @@
+# dsh-usage-panel bundle patch
+- insert:
+    - id: dsh-usage-panel
+      name: dsh-usage-panel
