@@ -6,10 +6,12 @@
 
 ---
 ![悬浮卡片](docs/images/screenshot-1.png)
-![完整仪表盘](docs/images/screenshot-2.png)
-![用量详情界面](docs/images/screenshot-3.png)
-
-## ✨ 功能
+<table>
+ <tr>
+ <td align="center"><img src="docs/images/screenshot-2.png" width="235" alt="完整仪表盘"><br><sub>完整仪表盘</sub></td>
+ <td align="center"><img src="docs/images/screenshot-3.png" width="235" alt="用量详情界面"><br><sub>用量详情</sub></td>
+ </tr>
+</table>
 
 | 功能 | 说明 |
 | --- | --- |
