@@ -5,6 +5,9 @@
 取数逻辑**直接运行在 DSH 宿主进程内**，挂在 DSH web 的同源路由 `/dsh-usage-panel/*` 上——**没有独立数据服务、没有常驻终端窗口、无需开机自启**，DSH 在跑就有数据，重启电脑也无需任何额外操作。
 
 ---
+![悬浮卡片](docs/images/screenshot-1.png)
+![完整仪表盘](docs/images/screenshot-2.png)
+![用量详情界面](docs/images/screenshot-3.png)
 
 ## ✨ 功能
 
@@ -26,10 +29,10 @@
 > 前置：已安装 **Node.js ≥ 18** 与 **DeepSeek Harness**（`npm install -g @deepseek-ai/dsh`），并有 opencode.ai 账号。
 
 1. 双击 **`install.bat`**
-   - 自动检查 node / npm / dsh（pnpm 缺失会自动安装）
-   - `npm pack` 用**当前最新产物**打包，装入 DSH web profile 并校验安装结果
+ - 自动检查 node / npm / dsh（pnpm 缺失会自动安装）
+ - `npm pack` 用**当前最新产物**打包，装入 DSH web profile 并校验安装结果
 2. 双击 **`set-credentials.bat`**（只需一次）
-   - 按提示录入 opencode 的 auth cookie 与 workspace id，保存到 `%DSH_HOME%\usage-panel.json`
+ - 按提示录入 opencode 的 auth cookie 与 workspace id，保存到 `%DSH_HOME%\usage-panel.json`
 3. **重启 DSH web**（或按提示热重载），刷新页面 —— 右下角出现用量卡片
 
 之后**无需任何操作**。改凭据：再双击一次 `set-credentials.bat`；卸载：双击 `uninstall.bat`（凭据文件保留，重装可复用）。
